@@ -1,1 +1,3 @@
-# Reducing_Burden
+# Reducing Burden
+
+Data Fusion using machine learning is essential for integrating multimodal data. We explored different multimodal fusion methods including early, late, and model fusion to classify radiological images and associated text reports. We investigated the amount of labeled data needed for comparable performance by multimodal and unimodal models. We also gauged the performance of multimodal models vs unimodal models. Furthermore, we compared the performance between the different multimodal models: early, late, and model fusion. Our experiments showed the potential of multimodal fusion to produce competitive results using less training data when compared to their unimodal counterparts which was more noticeable with the early fusion method. Overall, our results suggest data fusion techniques may decrease the burden of annotation by physicians.
