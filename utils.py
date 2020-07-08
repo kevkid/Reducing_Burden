@@ -487,7 +487,7 @@ class indianaDataGenerator_DF(keras.utils.Sequence):
     '''
     'Generates data for Keras'
     
-    def __init__(self, df, batch_size=8, dim=(256,256), crop=(224,224), n_channels=3, loc=None, shuffle=False, modality = ['image', 'text'], tokenizer = None, ohe = preprocessing.OneHotEncoder()):
+    def __init__(self, df, batch_size=8, dim=(256,256), crop=(224,224), n_channels=3, loc=None, shuffle=False, modality = ['image', 'text'], tokenizer = None, ohe = preprocessing.OneHotEncoder(), aug = None):
         'Initialization'
         self.df = df.reset_index()
         self.dim = dim
@@ -502,6 +502,7 @@ class indianaDataGenerator_DF(keras.utils.Sequence):
         self.loc = loc
         self.ohe = ohe#One hot encoder
         self.modality = modality
+        self.aug = aug
         self.__center_crop_points__()#get the points for cropping
         self.__label_to_cat__()
         #initialize tokenizer and create tokens
@@ -579,7 +580,9 @@ class indianaDataGenerator_DF(keras.utils.Sequence):
             assert os.path.exists(ID), "Image does not exist"
             row = self.df[self.df['img_id'] == ID]
             #read image
-            img = np.array(Image.open(ID).resize((self.dim)).crop((left,top,right,bottom)))
+            img = np.array(Image.open(ID).convert('L').resize((self.dim)).crop((left,top,right,bottom)))#.convert('L') == greyscale
+            if self.aug:
+                img = self.aug(image=img)["image"]
             #for 16 bit image: 65536, reshapes from -1 to 1
             X_image[i,] = np.reshape(2 * (img / 255) - 1., (*self.crop, self.n_channels))
             
@@ -589,8 +592,7 @@ class indianaDataGenerator_DF(keras.utils.Sequence):
             #get 0th label for the first element that has a match to that image id
             y[i,] = self.ohe.transform(row['normal'].to_numpy().reshape(-1, 1)).toarray()
 
-        return X_text, X_image, y
-    
+        return X_text, X_image, y    
 ####################
     
 
